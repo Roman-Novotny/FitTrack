@@ -20,3 +20,8 @@ create policy "delete own sessions" on public.workout_sessions for delete using 
 create index if not exists workout_sessions_user_date_idx on public.workout_sessions (user_id, performed_at desc);
 grant select, insert, update, delete on public.workout_sessions to authenticated;
 revoke all on public.workout_sessions from anon;
+
+-- Keep-alive: GitHub Action calls this daily so the free project is not paused after 7 idle days.
+create or replace function public.keep_alive() returns integer language sql stable security invoker set search_path = '' as $$ select 1 $$;
+revoke all on function public.keep_alive() from public;
+grant execute on function public.keep_alive() to anon, authenticated;

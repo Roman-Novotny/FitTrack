@@ -1,0 +1,27 @@
+name: Keep alive
+
+# Supabase (free) uspí projekt po 7 dnech nečinnosti. Tohle ho každý den „pošťouchne“
+# dotazem do databáze a zároveň ověří, že produkční web běží.
+# Publishable klíč je veřejný (je i v JS bundlu aplikace), proto může být tady.
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+env:
+  SUPABASE_URL: https://cxtlufcyjduqddwwnrzk.supabase.co
+  SUPABASE_KEY: sb_publishable_Yva9WiR7sZwaAu_vZcuPlA_mveJUMiG
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase database
+        run: |
+          for i in 1 2 3; do
+            if curl -fsS --max-time 30 -X POST "$SUPABASE_URL/rest/v1/rpc/keep_alive" \
+                 -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" -d '{}'; then echo; break; fi
+            [ "$i" = 3 ] && exit 1; sleep 20
+          done
+      - name: Check production site
+        run: curl -fsS --max-time 30 -o /dev/null https://fittrack-novotny.vercel.app
