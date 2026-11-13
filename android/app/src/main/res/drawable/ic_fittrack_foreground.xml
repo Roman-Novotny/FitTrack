@@ -1,0 +1,7 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- "F" mark, kept inside the 66dp adaptive-icon safe zone -->
+    <path android:fillColor="#21140E"
+        android:pathData="M41,33h28v10H52.5v8.5H66v9.5H52.5V75H41z" />
+</vector>

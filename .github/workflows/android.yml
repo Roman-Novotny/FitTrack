@@ -1,0 +1,33 @@
+name: Android APK
+
+# Sestaví debug APK (web build + Capacitor sync + Gradle) a nahraje ho jako artefakt běhu.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  VITE_SUPABASE_URL: https://cxtlufcyjduqddwwnrzk.supabase.co
+  VITE_SUPABASE_ANON_KEY: sb_publishable_Yva9WiR7sZwaAu_vZcuPlA_mveJUMiG
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: gradle }
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Gradle assembleDebug
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FitTrack-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
