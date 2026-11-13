@@ -5,3 +5,6 @@ dist
 .vercel
 android
 *.log
+
+.vercel
+.env*
